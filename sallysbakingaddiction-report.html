@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CSS Grabber Report</title>
+  <style>
+    @font-face { font-family: "sofia-pro"; src: url('https://use.typekit.net/af/66e20c/00000000000000007735f993/30/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=i8&v=3') format("woff2"),url('https://use.typekit.net/af/66e20c/00000000000000007735f993/30/d?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=i8&v=3') format("woff"),url('https://use.typekit.net/af/66e20c/00000000000000007735f993/30/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=i8&v=3') format("opentype"); font-style: italic; font-weight: 800; font-display: swap; font-stretch: normal; }
+@font-face { font-family: "sofia-pro"; src: url('https://use.typekit.net/af/4cc789/00000000000000003b9b46ed/27/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3') format("woff2"),url('https://use.typekit.net/af/4cc789/00000000000000003b9b46ed/27/d?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3') format("woff"),url('https://use.typekit.net/af/4cc789/00000000000000003b9b46ed/27/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3') format("opentype"); font-style: normal; font-weight: 400; font-display: swap; font-stretch: normal; }
+@font-face { font-family: "sofia-pro"; src: url('https://use.typekit.net/af/964ed8/00000000000000003b9b46ee/27/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=i4&v=3') format("woff2"),url('https://use.typekit.net/af/964ed8/00000000000000003b9b46ee/27/d?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=i4&v=3') format("woff"),url('https://use.typekit.net/af/964ed8/00000000000000003b9b46ee/27/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=i4&v=3') format("opentype"); font-style: italic; font-weight: 400; font-display: swap; font-stretch: normal; }
+    :root {
+      --bg: #ffffff;
+      --ink: #17181b;
+      --muted: #6b6d73;
+      --line: #d8dadd;
+      --panel: #fafafb;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif; }
+    .wrap { max-width: 1020px; margin: 40px auto 64px; padding: 0 22px; }
+    .line { border: 0; border-top: 1px solid var(--line); margin: 22px 0 28px; }
+    .section-title { margin: 0 0 16px; color: var(--muted); text-transform: uppercase; letter-spacing: .12em; font-size: 13px; font-weight: 600; }
+    .logo-wrap { text-align: center; padding: 8px 0 2px; }
+    .logo-image { max-width: 280px; max-height: 120px; width: auto; height: auto; object-fit: contain; }
+    .logo-missing { color: var(--muted); font-size: 14px; }
+    .logo-link { display: inline-block; margin-top: 10px; color: #0b63ce; font-size: 12px; word-break: break-all; text-decoration: none; }
+    .logo-link:hover { text-decoration: underline; }
+    .site-card { max-width: 520px; margin: 0 auto; text-align: center; border: 1px solid var(--line); padding: 14px 18px; }
+    .site-card-title { margin: 0 0 8px; font-size: clamp(28px, 4vw, 56px); font-weight: 600; letter-spacing: -0.02em; line-height: 1.05; }
+    .site-card-url { margin: 0; font-size: 13px; color: #2f3237; word-break: break-all; text-decoration: none; }
+    .site-card-url:hover { text-decoration: underline; }
+    .muted { color: var(--muted); }
+
+    .type-list { display: grid; gap: 12px; }
+    .type-row { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+    .type-name { font-size: 14px; margin-bottom: 7px; color: #2a2c30; }
+
+    .color-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+    .color-item { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
+    .swatch { width: 100%; aspect-ratio: 4 / 3; border-radius: 8px; border: 1px solid rgba(0,0,0,.08); margin-bottom: 10px; }
+    .color-label { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+    .color-value { font-size: 14px; }
+
+    .roles-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
+    .role-item { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
+    .role-swatch { width: 100%; height: 74px; border-radius: 8px; border: 1px solid rgba(0,0,0,.08); margin-bottom: 10px; }
+    .role-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+    .role-value { font-size: 13px; margin-bottom: 4px; }
+    .role-evidence { font-size: 12px; color: var(--muted); word-break: break-word; }
+    .badge { font-size: 11px; color: #7b7f87; font-weight: 500; }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <div class="site-card">
+      <h1 class="site-card-title">Sally&#x27;s Baking</h1>
+      <a class="site-card-url" href="https://sallysbakingaddiction.com/" target="_blank" rel="noreferrer">https://sallysbakingaddiction.com/</a>
+      <div class="role-evidence">Page: <a class="site-card-url" href="https://sallysbakingaddiction.com" target="_blank" rel="noreferrer">https://sallysbakingaddiction.com</a></div>
+    </div>
+    <hr class="line" />
+
+    <p class="section-title">Logo</p>
+    <div class="logo-wrap">
+      <img class="logo-image" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAIGNIUk0AAHomAACAhAAA+gAAAIDoAAB1MAAA6mAAADqYAAAXcJy6UTwAAAELUExURZXU0cKMcWecnGicnGicnGecnGecnGidnWidnWicnGicnGednWecnGmcnGecnGicnL+Yamucm2ecnJaThpCUimicnGicnM58dc58ds58dc58dc58dc58dc58ds58ds58dc58dc58dc58dc58dc58db+Yac58ds18dc97dc58dc58dc58dc98dc58dc58ds19dc58dc58dc58dc59dc58dWicnGicnGicnL+Yar+Yar+Yar+Yar6Yar6Yar+Yar+Yar+Yar+YaruZbL+Yar6Yar6Yar+Yar6Yar+Zar6Yar+Yar6Yar6Yar6Yar6Yar6Yar+Yar+Zar6YamicnL6YamicnGicnMmFcWedncUf8kgAAABZdFJOUwEEEC1FNTKA//242sJ4lMYyU28CCbX3wv/FsqeS8+f33NSw5aMsVcVx8GKe8UE/Zn/2rmhNTqGPcNVjjE5U9kWsdlw4lO7imPjmvtedpPKy+//Dnh4jYRYBPFkPnwAAAcFJREFUeNp1k+dyqzAQhUXzBXenIZAgLrGT3N5bumtsqpQY9P5PEuEJjIWd80uj881q92gWbEsa3ow7HUUC+yVdB/NbqqnJgboXef4/I4RQ7smNp/Wur6yi1SsAEqOllP00IuHCywFdr8qizx5iQuaLsACMBhMb8AgXDeIc0GtiGxOfLmMSB7QAjER4Ybpc+cFqOVsEOaA/se0I+ABxxkxvCqAqbQOUZHqkD3fZdaV6out1AYi460W+74/b7fQQHCU1sQK4ylwazqbRudPDnyRWaTWFOdvc5UX4FBaE0H2fAkUVc/i3yeE+3gAm6qdAFPt7S4jHk8yAAXYgkkuEfB+H/pxkgIO7EJ5esPJvRwElG8C2IVdPfESrAHm83AC9D6cQOhZqCy00WxqT7nwvpDZ2P1oIf+9iIeqqXkuOwGE6mfzACPe7vIgtJFnX9ZNjLTv9vLC4y2VKYgWud9lphPGZ6cJSBdYsAIQvXRuf2S4W5kyMHDAtBCHkzGewrXWtACAy9+TAGkYBOHjAk/zKSlEfFwDsYgfa6c7i1I0cgDayhmBH699/5Ffg8ku6d3nVg46qnX8b9Edv7rfyqzMaDQX7BW4uVwF5E+SvAAAAAElFTkSuQmCC" alt="Site logo" />
+      <br />
+      <a class="logo-link" href="https://sallysbakingaddiction.com/wp-content/uploads/2026/01/cropped-favicon-2-32x32.png" target="_blank" rel="noreferrer">https://sallysbakingaddiction.com/wp-content/uploads/2026/01/cropped-favicon-2-32x32.png</a>
+    </div>
+    <hr class="line" />
+
+    <section>
+      <p class="section-title">Typography</p>
+      <div class="type-list"><div class="type-row"><div class="type-name">H1 = sofia-pro</div><div class="type-preview" style="font-family:sofia-pro, Arial, Oxygen-Sans,Ubuntu,Cantarell,&quot;Helvetica Neue&quot;,sans-serif;font-size:2rem;font-weight:700;line-height:1.1">H1 Sample</div><div class="role-evidence" style="font-family:sofia-pro, Arial, Oxygen-Sans,Ubuntu,Cantarell,&quot;Helvetica Neue&quot;,sans-serif">Aa Bb Cc 123</div></div><div class="type-row"><div class="type-name">H2 = sofia-pro</div><div class="type-preview" style="font-family:sofia-pro, Arial, Oxygen-Sans,Ubuntu,Cantarell,&quot;Helvetica Neue&quot;,sans-serif;font-size:20px;font-weight:400;line-height:1">H2 Sample</div><div class="role-evidence" style="font-family:sofia-pro, Arial, Oxygen-Sans,Ubuntu,Cantarell,&quot;Helvetica Neue&quot;,sans-serif">Aa Bb Cc 123</div></div><div class="type-row"><div class="type-name">H3 = sofia-pro</div><div class="type-preview" style="font-family:sofia-pro, Arial, Oxygen-Sans,Ubuntu,Cantarell,&quot;Helvetica Neue&quot;,sans-serif;font-size:24px;font-weight:400;line-height:1.1">H3 Sample</div><div class="role-evidence" style="font-family:sofia-pro, Arial, Oxygen-Sans,Ubuntu,Cantarell,&quot;Helvetica Neue&quot;,sans-serif">Aa Bb Cc 123</div></div><div class="type-row"><div class="type-name">H4 = sofia-pro</div><div class="type-preview" style="font-family:sofia-pro, Arial, Oxygen-Sans,Ubuntu,Cantarell,&quot;Helvetica Neue&quot;,sans-serif;font-size:1em;font-weight:400;line-height:1.2">H4 Sample</div><div class="role-evidence" style="font-family:sofia-pro, Arial, Oxygen-Sans,Ubuntu,Cantarell,&quot;Helvetica Neue&quot;,sans-serif">Aa Bb Cc 123</div></div><div class="type-row"><div class="type-name">H5 = sofia-pro</div><div class="type-preview" style="font-family:sofia-pro, Arial, Oxygen-Sans,Ubuntu,Cantarell,&quot;Helvetica Neue&quot;,sans-serif;font-size:1rem;font-weight:400;line-height:1.2">H5 Sample</div><div class="role-evidence" style="font-family:sofia-pro, Arial, Oxygen-Sans,Ubuntu,Cantarell,&quot;Helvetica Neue&quot;,sans-serif">Aa Bb Cc 123</div></div><div class="type-row"><div class="type-name">Body = -apple-system</div><div class="type-preview" style="font-family:-apple-system,BlinkMacSystemFont,&quot;Segoe UI&quot;,Roboto,Oxygen-Sans,Ubuntu,Cantarell,&quot;Helvetica Neue&quot;,sans-serif;font-size:1.25rem;font-weight:400;line-height:1.15">Body Sample</div><div class="role-evidence" style="font-family:-apple-system,BlinkMacSystemFont,&quot;Segoe UI&quot;,Roboto,Oxygen-Sans,Ubuntu,Cantarell,&quot;Helvetica Neue&quot;,sans-serif">Aa Bb Cc 123</div></div></div>
+    </section>
+
+    <hr class="line" />
+    <section>
+      <p class="section-title">Colors</p>
+      <div class="color-grid"><div class="color-item"><div class="swatch" style="background:#010101"></div><div class="color-label">Body Color</div><div class="color-value">#010101</div></div><div class="color-item"><div class="swatch" style="background:#010101"></div><div class="color-label">Title Color</div><div class="color-value">#010101</div></div><div class="color-item"><div class="swatch" style="background:#010101"></div><div class="color-label">Link Color</div><div class="color-value">#010101</div></div></div>
+    </section>
+
+    <hr class="line" />
+    <section>
+      <p class="section-title">Brand Profile</p>
+      <div class="roles-grid"><div class="role-item"><div class="role-swatch" style="background:#010101"></div><div class="role-title">Text Body <span class="badge">Found</span></div><div class="role-value">#010101</div><div class="role-evidence">Evidence: body</div></div><div class="role-item"><div class="role-swatch" style="background:#010101"></div><div class="role-title">Text Heading <span class="badge">Found</span></div><div class="role-value">#010101</div><div class="role-evidence">Evidence: .formkit-form h2</div></div><div class="role-item"><div class="role-swatch" style="background:#fff"></div><div class="role-title">Text Muted <span class="badge">Found</span></div><div class="role-value">#fff</div><div class="role-evidence">Evidence: .wp-block-gallery.has-nested-images figure.wp-block-image figcaption</div></div><div class="role-item"><div class="role-swatch" style="background:#010101"></div><div class="role-title">Link Default <span class="badge">Found</span></div><div class="role-value">#010101</div><div class="role-evidence">Evidence: .sallys-shop-buttons a.wp-block-button__link.wp-element-button</div></div><div class="role-item"><div class="role-swatch" style="background:#010101"></div><div class="role-title">Link Hover <span class="badge">Found</span></div><div class="role-value">#010101</div><div class="role-evidence">Evidence: .term-link:hover</div></div><div class="role-item"><div class="role-swatch" style="background:#000"></div><div class="role-title">Button Primary Background <span class="badge">Found</span></div><div class="role-value">#000</div><div class="role-evidence">Evidence: .tasty-recipes-scale-container button.tasty-recipes-scale-button-active</div></div><div class="role-item"><div class="role-swatch" style="background:#010101"></div><div class="role-title">Button Primary Text <span class="badge">Found</span></div><div class="role-value">#010101</div><div class="role-evidence">Evidence: .sallys-shop-buttons a.wp-block-button__link.wp-element-button</div></div><div class="role-item"><div class="role-swatch" style="background:#000"></div><div class="role-title">Button Primary Border <span class="badge">Found</span></div><div class="role-value">#000</div><div class="role-evidence">Evidence: .tasty-recipes-scale-container button.tasty-recipes-scale-button-active</div></div><div class="role-item"><div class="role-swatch" style="background:#010101"></div><div class="role-title">Button Primary Hover Background <span class="badge">Found</span></div><div class="role-value">#010101</div><div class="role-evidence">Evidence: .tasty-recipes-entry-content .tasty-recipes-buttons a:hover</div></div><div class="role-item"><div class="role-swatch" style="background:#b2b2bb"></div><div class="role-title">Surface Page <span class="badge">Found</span></div><div class="role-value">#b2b2bb</div><div class="role-evidence">Evidence: body:not(.tasty-recipes-print-view) .tasty-recipes-print-button.tasty-recipes-print-above-card:hover</div></div><div class="role-item"><div class="role-swatch" style="background:#010101"></div><div class="role-title">Surface Section <span class="badge">Found</span></div><div class="role-value">#010101</div><div class="role-evidence">Evidence: .tasty-recipes-entry-content .tasty-recipes-buttons a:hover</div></div><div class="role-item"><div class="role-swatch" style="background:#010101"></div><div class="role-title">Surface Card <span class="badge">Found</span></div><div class="role-value">#010101</div><div class="role-evidence">Evidence: .tasty-recipes-entry-content .tasty-recipes-buttons a:hover</div></div><div class="role-item"><div class="role-swatch" style="background:#010101"></div><div class="role-title">Border Default <span class="badge">Found</span></div><div class="role-value">#010101</div><div class="role-evidence">Evidence: .term-link:hover</div></div><div class="role-item"><div class="role-swatch" style="background:#010101"></div><div class="role-title">Icon Default <span class="badge">Found</span></div><div class="role-value">#010101</div><div class="role-evidence">Evidence: .is-style-bg-simple .block-section-icon svg</div></div><div class="role-item"><div class="role-swatch" style="background:#010101"></div><div class="role-title">Icon Accent <span class="badge">Found</span></div><div class="role-value">#010101</div><div class="role-evidence">Evidence: .callout-content-simple .block-callout-button:hover svg</div></div></div>
+    </section>
+  </main>
+</body>
+</html>

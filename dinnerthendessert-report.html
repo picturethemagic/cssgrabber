@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CSS Grabber Report - Error</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --ink: #17181b;
+      --muted: #6b6d73;
+      --line: #d8dadd;
+      --panel: #fafafb;
+      --danger: #b42318;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif; }
+    .wrap { max-width: 900px; margin: 40px auto 64px; padding: 0 22px; }
+    .toolbar { display: flex; justify-content: flex-end; margin-bottom: 10px; }
+    .print-btn { border: 1px solid var(--line); background: #fff; color: #1f2329; border-radius: 999px; padding: 8px 14px; font-size: 13px; cursor: pointer; }
+    .print-btn:hover { background: #f6f7f9; }
+    .site-card { max-width: 560px; margin: 0 auto; text-align: center; border: 1px solid var(--line); padding: 14px 18px; }
+    .site-card-title { margin: 0 0 8px; font-size: clamp(28px, 4vw, 44px); font-weight: 600; letter-spacing: -0.02em; line-height: 1.05; }
+    .site-card-url { margin: 0; font-size: 13px; color: #2f3237; word-break: break-all; text-decoration: none; }
+    .site-card-url:hover { text-decoration: underline; }
+    .line { border: 0; border-top: 1px solid var(--line); margin: 22px 0 28px; }
+    .section-title { margin: 0 0 16px; color: var(--muted); text-transform: uppercase; letter-spacing: .12em; font-size: 13px; font-weight: 600; }
+    .error-card { border: 1px solid #f2d4cf; background: #fff8f7; border-radius: 10px; padding: 14px; }
+    .error-title { color: var(--danger); font-weight: 700; margin-bottom: 6px; }
+    .raw { margin-top: 12px; padding: 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: #2a2c30; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; word-break: break-word; }
+    ul { margin: 0; padding-left: 18px; }
+    li { margin-bottom: 8px; }
+    @media print {
+      .toolbar { display: none; }
+      body { background: #fff; }
+      .wrap { margin: 0 auto; padding-top: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <div class="toolbar">
+      <button class="print-btn" type="button" onclick="window.print()">Print | Save to PDF</button>
+    </div>
+    <div class="site-card">
+      <h1 class="site-card-title">www.dinnerthendessert.com</h1>
+      <a class="site-card-url" href="https://www.dinnerthendessert.com/" target="_blank" rel="noreferrer">https://www.dinnerthendessert.com/</a>
+      <div style="font-size:12px;color:#6b6d73;margin-top:6px;">Page: <a class="site-card-url" href="https://www.dinnerthendessert.com" target="_blank" rel="noreferrer">https://www.dinnerthendessert.com</a></div>
+    </div>
+    <hr class="line" />
+    <p class="section-title">Report Status</p>
+    <div class="error-card">
+      <div class="error-title">Could not complete full extraction</div>
+      <div>No dice: their bot wall stepped in (HTTP 403 challenge).</div>
+      <ul><li>They are serving a challenge page instead of real content.</li><li>Try a different page on the same site.</li><li>Retry later or from another network.</li></ul>
+      <div class="raw">HTTP Error 403: Forbidden</div>
+    </div>
+  </main>
+</body>
+</html>

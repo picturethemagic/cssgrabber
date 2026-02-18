@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CSS Grabber Report</title>
+  <style>
+    
+    :root {
+      --bg: #ffffff;
+      --ink: #17181b;
+      --muted: #6b6d73;
+      --line: #d8dadd;
+      --panel: #fafafb;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif; }
+    .wrap { max-width: 1020px; margin: 40px auto 64px; padding: 0 22px; }
+    .toolbar { display: flex; justify-content: flex-end; margin-bottom: 10px; }
+    .print-btn { border: 1px solid var(--line); background: #fff; color: #1f2329; border-radius: 999px; padding: 8px 14px; font-size: 13px; cursor: pointer; }
+    .print-btn:hover { background: #f6f7f9; }
+    .line { border: 0; border-top: 1px solid var(--line); margin: 22px 0 28px; }
+    .section-title { margin: 0 0 16px; color: var(--muted); text-transform: uppercase; letter-spacing: .12em; font-size: 13px; font-weight: 600; }
+    .logo-wrap { text-align: center; padding: 8px 0 2px; }
+    .logo-image { max-width: 280px; max-height: 120px; width: auto; height: auto; object-fit: contain; }
+    .logo-missing { color: var(--muted); font-size: 14px; }
+    .logo-link { display: inline-block; margin-top: 10px; color: #0b63ce; font-size: 12px; word-break: break-all; text-decoration: none; }
+    .logo-link:hover { text-decoration: underline; }
+    .site-card { max-width: 520px; margin: 0 auto; text-align: center; border: 1px solid var(--line); padding: 14px 18px; }
+    .site-card-title { margin: 0 0 8px; font-size: clamp(28px, 4vw, 56px); font-weight: 600; letter-spacing: -0.02em; line-height: 1.05; }
+    .site-card-url { margin: 0; font-size: 13px; color: #2f3237; word-break: break-all; text-decoration: none; }
+    .site-card-url:hover { text-decoration: underline; }
+    .muted { color: var(--muted); }
+
+    .type-list { display: grid; gap: 12px; }
+    .type-row { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+    .type-name { font-size: 14px; margin-bottom: 7px; color: #2a2c30; }
+
+    .color-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+    .color-item { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
+    .swatch { width: 100%; aspect-ratio: 4 / 3; border-radius: 8px; border: 1px solid rgba(0,0,0,.08); margin-bottom: 10px; }
+    .color-label { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+    .color-value { font-size: 14px; }
+
+    .roles-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
+    .role-item { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
+    .role-swatch { width: 100%; height: 74px; border-radius: 8px; border: 1px solid rgba(0,0,0,.08); margin-bottom: 10px; }
+    .role-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+    .role-value { font-size: 13px; margin-bottom: 4px; }
+    .role-evidence { font-size: 12px; color: var(--muted); word-break: break-word; }
+    .badge { font-size: 11px; color: #7b7f87; font-weight: 500; }
+    @media print {
+      .toolbar { display: none; }
+      body { background: #fff; }
+      .wrap { margin: 0 auto; padding-top: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <div class="toolbar">
+      <button class="print-btn" type="button" onclick="window.print()">Print | Save to PDF</button>
+    </div>
+    <div class="site-card">
+      <h1 class="site-card-title">Simple Gray T-Shirt</h1>
+      <a class="site-card-url" href="https://simplegraytshirt.com/" target="_blank" rel="noreferrer">https://simplegraytshirt.com/</a>
+      <div class="role-evidence">Page: <a class="site-card-url" href="https://simplegraytshirt.com/" target="_blank" rel="noreferrer">https://simplegraytshirt.com/</a></div>
+    </div>
+    <hr class="line" />
+
+    <p class="section-title">Logo</p>
+    <div class="logo-wrap">
+      <img class="logo-image" src="data:image/png;base64,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" alt="Site logo" />
+      <br />
+      <a class="logo-link" href="https://simplegraytshirt.com/wp-content/uploads/2025/10/simple-gray-tshirt-logo-200-x-70-px.png" target="_blank" rel="noreferrer">https://simplegraytshirt.com/wp-content/uploads/2025/10/simple-gray-tshirt-logo-200-x-70-px.png</a>
+    </div>
+    <hr class="line" />
+
+    <section>
+      <p class="section-title">Typography</p>
+      <div class="type-list"><div class="type-row"><div class="type-name">H1 = -apple-system</div><div class="type-preview" style="font-family:-apple-system,system-ui,BlinkMacSystemFont,&quot;Segoe UI&quot;,Helvetica,Arial,sans-serif,&quot;Apple Color Emoji&quot;,&quot;Segoe UI Emoji&quot;,&quot;Segoe UI Symbol&quot;;font-size:30px;font-weight:500;line-height:1.2">H1 Sample</div><div class="role-evidence" style="font-family:-apple-system,system-ui,BlinkMacSystemFont,&quot;Segoe UI&quot;,Helvetica,Arial,sans-serif,&quot;Apple Color Emoji&quot;,&quot;Segoe UI Emoji&quot;,&quot;Segoe UI Symbol&quot;">Aa Bb Cc 123</div></div><div class="type-row"><div class="type-name">H2 = -apple-system</div><div class="type-preview" style="font-family:-apple-system,system-ui,BlinkMacSystemFont,&quot;Segoe UI&quot;,Helvetica,Arial,sans-serif,&quot;Apple Color Emoji&quot;,&quot;Segoe UI Emoji&quot;,&quot;Segoe UI Symbol&quot;;font-size:1.625em;font-weight:700;line-height:1.2">H2 Sample</div><div class="role-evidence" style="font-family:-apple-system,system-ui,BlinkMacSystemFont,&quot;Segoe UI&quot;,Helvetica,Arial,sans-serif,&quot;Apple Color Emoji&quot;,&quot;Segoe UI Emoji&quot;,&quot;Segoe UI Symbol&quot;">Aa Bb Cc 123</div></div><div class="type-row"><div class="type-name">H3 = -apple-system</div><div class="type-preview" style="font-family:-apple-system,system-ui,BlinkMacSystemFont,&quot;Segoe UI&quot;,Helvetica,Arial,sans-serif,&quot;Apple Color Emoji&quot;,&quot;Segoe UI Emoji&quot;,&quot;Segoe UI Symbol&quot;;font-size:1.625em;font-weight:500;line-height:1.2">H3 Sample</div><div class="role-evidence" style="font-family:-apple-system,system-ui,BlinkMacSystemFont,&quot;Segoe UI&quot;,Helvetica,Arial,sans-serif,&quot;Apple Color Emoji&quot;,&quot;Segoe UI Emoji&quot;,&quot;Segoe UI Symbol&quot;">Aa Bb Cc 123</div></div><div class="type-row"><div class="type-name">H4 = -apple-system</div><div class="type-preview" style="font-family:-apple-system,system-ui,BlinkMacSystemFont,&quot;Segoe UI&quot;,Helvetica,Arial,sans-serif,&quot;Apple Color Emoji&quot;,&quot;Segoe UI Emoji&quot;,&quot;Segoe UI Symbol&quot;;font-size:18px;font-weight:300;line-height:1.8">H4 Sample</div><div class="role-evidence" style="font-family:-apple-system,system-ui,BlinkMacSystemFont,&quot;Segoe UI&quot;,Helvetica,Arial,sans-serif,&quot;Apple Color Emoji&quot;,&quot;Segoe UI Emoji&quot;,&quot;Segoe UI Symbol&quot;">Aa Bb Cc 123</div></div><div class="type-row"><div class="type-name">H5 = -apple-system</div><div class="type-preview" style="font-family:-apple-system,system-ui,BlinkMacSystemFont,&quot;Segoe UI&quot;,Helvetica,Arial,sans-serif,&quot;Apple Color Emoji&quot;,&quot;Segoe UI Emoji&quot;,&quot;Segoe UI Symbol&quot;;font-size:18px;font-weight:300;line-height:1.8">H5 Sample</div><div class="role-evidence" style="font-family:-apple-system,system-ui,BlinkMacSystemFont,&quot;Segoe UI&quot;,Helvetica,Arial,sans-serif,&quot;Apple Color Emoji&quot;,&quot;Segoe UI Emoji&quot;,&quot;Segoe UI Symbol&quot;">Aa Bb Cc 123</div></div><div class="type-row"><div class="type-name">Body = -apple-system</div><div class="type-preview" style="font-family:-apple-system,system-ui,BlinkMacSystemFont,&quot;Segoe UI&quot;,Helvetica,Arial,sans-serif,&quot;Apple Color Emoji&quot;,&quot;Segoe UI Emoji&quot;,&quot;Segoe UI Symbol&quot;;font-size:18px;font-weight:300;line-height:1.8">Body Sample</div><div class="role-evidence" style="font-family:-apple-system,system-ui,BlinkMacSystemFont,&quot;Segoe UI&quot;,Helvetica,Arial,sans-serif,&quot;Apple Color Emoji&quot;,&quot;Segoe UI Emoji&quot;,&quot;Segoe UI Symbol&quot;">Aa Bb Cc 123</div></div></div>
+    </section>
+
+    <hr class="line" />
+    <section>
+      <p class="section-title">Colors</p>
+      <div class="color-grid"><div class="color-item"><div class="swatch" style="background:#010101"></div><div class="color-label">Body Color</div><div class="color-value">#010101</div></div><div class="color-item"><div class="swatch" style="background:#010101"></div><div class="color-label">Title Color</div><div class="color-value">#010101</div></div><div class="color-item"><div class="swatch" style="background:#000000"></div><div class="color-label">Link Color</div><div class="color-value">#000000</div></div></div>
+    </section>
+
+    <hr class="line" />
+    <section>
+      <p class="section-title">Brand Profile</p>
+      <div class="roles-grid"><div class="role-item"><div class="role-swatch" style="background:#010101"></div><div class="role-title">Text Body <span class="badge">Found</span></div><div class="role-value">#010101</div><div class="role-evidence">Evidence: body</div></div><div class="role-item"><div class="role-swatch" style="background:#010101"></div><div class="role-title">Text Heading <span class="badge">Inferred</span></div><div class="role-value">#010101</div><div class="role-evidence">Evidence: inferred from computed h1/h2</div></div><div class="role-item"><div class="role-swatch" style="background:#777777"></div><div class="role-title">Text Muted <span class="badge">Inferred</span></div><div class="role-value">#777777</div><div class="role-evidence">Evidence: default muted fallback</div></div><div class="role-item"><div class="role-swatch" style="background:#000"></div><div class="role-title">Link Default <span class="badge">Found</span></div><div class="role-value">#000</div><div class="role-evidence">Evidence: body .feastmobilenavbar a</div></div><div class="role-item"><div class="role-swatch" style="background:#010101"></div><div class="role-title">Link Hover <span class="badge">Inferred</span></div><div class="role-value">#010101</div><div class="role-evidence">Evidence: inferred from computed link</div></div><div class="role-item"><div class="role-swatch" style="background:#32373c"></div><div class="role-title">Button Primary Background <span class="badge">Found</span></div><div class="role-value">#32373c</div><div class="role-evidence">Evidence: .wp-block-button__link</div></div><div class="role-item"><div class="role-swatch" style="background:#fff"></div><div class="role-title">Button Primary Text <span class="badge">Found</span></div><div class="role-value">#fff</div><div class="role-evidence">Evidence: button</div></div><div class="role-item"><div class="role-swatch" style="background:#d8dadd"></div><div class="role-title">Button Primary Border <span class="badge">Inferred</span></div><div class="role-value">#d8dadd</div><div class="role-evidence">Evidence: inferred from computed button border</div></div><div class="role-item"><div class="role-swatch" style="background:#010101"></div><div class="role-title">Button Primary Hover Background <span class="badge">Inferred</span></div><div class="role-value">#010101</div><div class="role-evidence">Evidence: inferred from heading tone</div></div><div class="role-item"><div class="role-swatch" style="background:#f2f2f2"></div><div class="role-title">Surface Page <span class="badge">Found</span></div><div class="role-value">#f2f2f2</div><div class="role-evidence">Evidence: .site-container .is-style-full-width-feature-wrapper</div></div><div class="role-item"><div class="role-swatch" style="background:#fefefe"></div><div class="role-title">Surface Section <span class="badge">Found</span></div><div class="role-value">#fefefe</div><div class="role-evidence">Evidence: .mmm-dialog .mmm-content</div></div><div class="role-item"><div class="role-swatch" style="background:#ffffff"></div><div class="role-title">Surface Card <span class="badge">Inferred</span></div><div class="role-value">#ffffff</div><div class="role-evidence">Evidence: default card fallback</div></div><div class="role-item"><div class="role-swatch" style="background:#d8dadd"></div><div class="role-title">Border Default <span class="badge">Inferred</span></div><div class="role-value">#d8dadd</div><div class="role-evidence">Evidence: inferred from computed button border</div></div><div class="role-item"><div class="role-swatch" style="background:#000"></div><div class="role-title">Icon Default <span class="badge">Found</span></div><div class="role-value">#000</div><div class="role-evidence">Evidence: .feastsubscribebutton svg</div></div><div class="role-item"><div class="role-swatch" style="background:#010101"></div><div class="role-title">Icon Accent <span class="badge">Inferred</span></div><div class="role-value">#010101</div><div class="role-evidence">Evidence: inferred from link accent</div></div></div>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CSS Grabber Report</title>
+  <style>
+    
+    :root {
+      --bg: #ffffff;
+      --ink: #17181b;
+      --muted: #6b6d73;
+      --line: #d8dadd;
+      --panel: #fafafb;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif; }
+    .wrap { max-width: 1020px; margin: 40px auto 64px; padding: 0 22px; }
+    .line { border: 0; border-top: 1px solid var(--line); margin: 22px 0 28px; }
+    .section-title { margin: 0 0 16px; color: var(--muted); text-transform: uppercase; letter-spacing: .12em; font-size: 13px; font-weight: 600; }
+    .logo-wrap { text-align: center; padding: 8px 0 2px; }
+    .logo-image { max-width: 280px; max-height: 120px; width: auto; height: auto; object-fit: contain; }
+    .logo-missing { color: var(--muted); font-size: 14px; }
+    .logo-link { display: inline-block; margin-top: 10px; color: #0b63ce; font-size: 12px; word-break: break-all; text-decoration: none; }
+    .logo-link:hover { text-decoration: underline; }
+    .site-card { max-width: 520px; margin: 0 auto; text-align: center; border: 1px solid var(--line); padding: 14px 18px; }
+    .site-card-title { margin: 0 0 8px; font-size: clamp(28px, 4vw, 56px); font-weight: 600; letter-spacing: -0.02em; line-height: 1.05; }
+    .site-card-url { margin: 0; font-size: 13px; color: #2f3237; word-break: break-all; text-decoration: none; }
+    .site-card-url:hover { text-decoration: underline; }
+    .muted { color: var(--muted); }
+
+    .type-list { display: grid; gap: 12px; }
+    .type-row { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+    .type-name { font-size: 14px; margin-bottom: 7px; color: #2a2c30; }
+
+    .color-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+    .color-item { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
+    .swatch { width: 100%; aspect-ratio: 4 / 3; border-radius: 8px; border: 1px solid rgba(0,0,0,.08); margin-bottom: 10px; }
+    .color-label { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+    .color-value { font-size: 14px; }
+
+    .roles-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
+    .role-item { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
+    .role-swatch { width: 100%; height: 74px; border-radius: 8px; border: 1px solid rgba(0,0,0,.08); margin-bottom: 10px; }
+    .role-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+    .role-value { font-size: 13px; margin-bottom: 4px; }
+    .role-evidence { font-size: 12px; color: var(--muted); word-break: break-word; }
+    .badge { font-size: 11px; color: #7b7f87; font-weight: 500; }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <div class="site-card">
+      <h1 class="site-card-title">Untitled Site</h1>
+      <a class="site-card-url" href="https://www.aol.com/" target="_blank" rel="noreferrer">https://www.aol.com/</a>
+      <div class="role-evidence">Page: <a class="site-card-url" href="https://www.aol.com" target="_blank" rel="noreferrer">https://www.aol.com</a></div>
+    </div>
+    <hr class="line" />
+
+    <p class="section-title">Logo</p>
+    <div class="logo-wrap">
+      <div class="logo-missing">Logo not found</div>
+      <br />
+      <span class="logo-link muted">No direct logo URL found.</span>
+    </div>
+    <hr class="line" />
+
+    <section>
+      <p class="section-title">Typography</p>
+      <div class="type-list"><div class="type-row"><div class="type-name">H1 = not found</div><div class="type-preview" style="font-family:-apple-system, BlinkMacSystemFont, &#x27;Helvetica Neue&#x27;, Arial, sans-serif;font-size:1rem;font-weight:400;line-height:1.4">H1 Sample</div><div class="role-evidence" style="font-family:-apple-system, BlinkMacSystemFont, &#x27;Helvetica Neue&#x27;, Arial, sans-serif">Aa Bb Cc 123</div></div><div class="type-row"><div class="type-name">H2 = not found</div><div class="type-preview" style="font-family:-apple-system, BlinkMacSystemFont, &#x27;Helvetica Neue&#x27;, Arial, sans-serif;font-size:1rem;font-weight:400;line-height:1.4">H2 Sample</div><div class="role-evidence" style="font-family:-apple-system, BlinkMacSystemFont, &#x27;Helvetica Neue&#x27;, Arial, sans-serif">Aa Bb Cc 123</div></div><div class="type-row"><div class="type-name">H3 = not found</div><div class="type-preview" style="font-family:-apple-system, BlinkMacSystemFont, &#x27;Helvetica Neue&#x27;, Arial, sans-serif;font-size:1rem;font-weight:400;line-height:1.4">H3 Sample</div><div class="role-evidence" style="font-family:-apple-system, BlinkMacSystemFont, &#x27;Helvetica Neue&#x27;, Arial, sans-serif">Aa Bb Cc 123</div></div><div class="type-row"><div class="type-name">H4 = not found</div><div class="type-preview" style="font-family:-apple-system, BlinkMacSystemFont, &#x27;Helvetica Neue&#x27;, Arial, sans-serif;font-size:1rem;font-weight:400;line-height:1.4">H4 Sample</div><div class="role-evidence" style="font-family:-apple-system, BlinkMacSystemFont, &#x27;Helvetica Neue&#x27;, Arial, sans-serif">Aa Bb Cc 123</div></div><div class="type-row"><div class="type-name">H5 = not found</div><div class="type-preview" style="font-family:-apple-system, BlinkMacSystemFont, &#x27;Helvetica Neue&#x27;, Arial, sans-serif;font-size:1rem;font-weight:400;line-height:1.4">H5 Sample</div><div class="role-evidence" style="font-family:-apple-system, BlinkMacSystemFont, &#x27;Helvetica Neue&#x27;, Arial, sans-serif">Aa Bb Cc 123</div></div><div class="type-row"><div class="type-name">Body = not found</div><div class="type-preview" style="font-family:-apple-system, BlinkMacSystemFont, &#x27;Helvetica Neue&#x27;, Arial, sans-serif;font-size:1rem;font-weight:400;line-height:1.4">Body Sample</div><div class="role-evidence" style="font-family:-apple-system, BlinkMacSystemFont, &#x27;Helvetica Neue&#x27;, Arial, sans-serif">Aa Bb Cc 123</div></div></div>
+    </section>
+
+    <hr class="line" />
+    <section>
+      <p class="section-title">Colors</p>
+      <div class="color-grid"><div class="color-item"><div class="swatch" style="background:#000000"></div><div class="color-label">Body Color</div><div class="color-value">#000000</div></div><div class="color-item"><div class="swatch" style="background:#000000"></div><div class="color-label">Title Color</div><div class="color-value">#000000</div></div><div class="color-item"><div class="swatch" style="background:#000000"></div><div class="color-label">Link Color</div><div class="color-value">#000000</div></div></div>
+    </section>
+
+    <hr class="line" />
+    <section>
+      <p class="section-title">Brand Profile</p>
+      <div class="roles-grid"><div class="role-item"><div class="role-swatch" style="background:#000"></div><div class="role-title">Text Body <span class="badge">Inferred</span></div><div class="role-value">#000</div><div class="role-evidence">Evidence: inferred from computed body</div></div><div class="role-item"><div class="role-swatch" style="background:#000"></div><div class="role-title">Text Heading <span class="badge">Inferred</span></div><div class="role-value">#000</div><div class="role-evidence">Evidence: inferred from computed h1/h2</div></div><div class="role-item"><div class="role-swatch" style="background:#777777"></div><div class="role-title">Text Muted <span class="badge">Inferred</span></div><div class="role-value">#777777</div><div class="role-evidence">Evidence: default muted fallback</div></div><div class="role-item"><div class="role-swatch" style="background:#000"></div><div class="role-title">Link Default <span class="badge">Inferred</span></div><div class="role-value">#000</div><div class="role-evidence">Evidence: inferred from computed link</div></div><div class="role-item"><div class="role-swatch" style="background:#000"></div><div class="role-title">Link Hover <span class="badge">Inferred</span></div><div class="role-value">#000</div><div class="role-evidence">Evidence: inferred from computed link</div></div><div class="role-item"><div class="role-swatch" style="background:#000"></div><div class="role-title">Button Primary Background <span class="badge">Inferred</span></div><div class="role-value">#000</div><div class="role-evidence">Evidence: inferred from link accent</div></div><div class="role-item"><div class="role-swatch" style="background:#ffffff"></div><div class="role-title">Button Primary Text <span class="badge">Inferred</span></div><div class="role-value">#ffffff</div><div class="role-evidence">Evidence: default button text fallback</div></div><div class="role-item"><div class="role-swatch" style="background:#d8dadd"></div><div class="role-title">Button Primary Border <span class="badge">Inferred</span></div><div class="role-value">#d8dadd</div><div class="role-evidence">Evidence: inferred from computed button border</div></div><div class="role-item"><div class="role-swatch" style="background:#000"></div><div class="role-title">Button Primary Hover Background <span class="badge">Inferred</span></div><div class="role-value">#000</div><div class="role-evidence">Evidence: inferred from heading tone</div></div><div class="role-item"><div class="role-swatch" style="background:#ffffff"></div><div class="role-title">Surface Page <span class="badge">Inferred</span></div><div class="role-value">#ffffff</div><div class="role-evidence">Evidence: inferred from computed body background</div></div><div class="role-item"><div class="role-swatch" style="background:#f5f5f7"></div><div class="role-title">Surface Section <span class="badge">Inferred</span></div><div class="role-value">#f5f5f7</div><div class="role-evidence">Evidence: default section fallback</div></div><div class="role-item"><div class="role-swatch" style="background:#ffffff"></div><div class="role-title">Surface Card <span class="badge">Inferred</span></div><div class="role-value">#ffffff</div><div class="role-evidence">Evidence: default card fallback</div></div><div class="role-item"><div class="role-swatch" style="background:#d8dadd"></div><div class="role-title">Border Default <span class="badge">Inferred</span></div><div class="role-value">#d8dadd</div><div class="role-evidence">Evidence: inferred from computed button border</div></div><div class="role-item"><div class="role-swatch" style="background:#000"></div><div class="role-title">Icon Default <span class="badge">Inferred</span></div><div class="role-value">#000</div><div class="role-evidence">Evidence: inferred from heading tone</div></div><div class="role-item"><div class="role-swatch" style="background:#000"></div><div class="role-title">Icon Accent <span class="badge">Inferred</span></div><div class="role-value">#000</div><div class="role-evidence">Evidence: inferred from link accent</div></div></div>
+    </section>
+  </main>
+</body>
+</html>
