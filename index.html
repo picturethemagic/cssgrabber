@@ -350,7 +350,7 @@
 
       <form class="url-form" id="grabber-form" action="/api/report" method="post" aria-label="Website Brand Extraction Tool">
         <div class="form-row">
-          <input class="url-input" id="target-url" name="url" type="url" placeholder="https://example.com" required aria-label="Website URL" />
+          <input class="url-input" id="target-url" name="url" type="text" inputmode="url" autocapitalize="off" spellcheck="false" placeholder="https://example.com" required aria-label="Website URL" />
           <button class="submit-btn" type="submit">Generate Report</button>
         </div>
         <p class="form-help">Instant HTML output. Works best with public, non-login pages.</p>
@@ -474,7 +474,7 @@
     const status = document.getElementById("form-status");
     const input = document.getElementById("target-url");
 
-    form.addEventListener("submit", async function (event) {
+    form.addEventListener("submit", function (event) {
       event.preventDefault();
       let value = input.value.trim();
       if (value && !/^https?:\/\//i.test(value)) {
@@ -488,44 +488,9 @@
         status.textContent = "Enter a valid URL, for example: https://example.com";
         return;
       }
-
       status.style.display = "block";
       status.textContent = "Generating report...";
-
-      try {
-        const response = await fetch("/api/report", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ url: parsed.href })
-        });
-
-        if (!response.ok) {
-          let message = "Report generation failed.";
-          try {
-            const data = await response.json();
-            if (data && data.error) {
-              message = data.error;
-            }
-          } catch (ignored) {}
-          status.textContent = message;
-          return;
-        }
-
-        const blob = await response.blob();
-        const host = (parsed.hostname || "report").replace(/^www\./, "");
-        const filename = `${host.replace(/[^a-z0-9.-]/gi, "-")}-report.html`;
-        const objectUrl = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = objectUrl;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(objectUrl);
-        status.textContent = "Report generated and download started.";
-      } catch (err) {
-        status.textContent = "Could not reach the report service. Try again.";
-      }
+      window.location.href = "/output.html?url=" + encodeURIComponent(parsed.href);
     });
   </script>
 </body>

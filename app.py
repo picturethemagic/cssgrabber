@@ -7,7 +7,7 @@ import tempfile
 from pathlib import Path
 from urllib.parse import urlparse
 
-from flask import Flask, jsonify, request, send_file
+from flask import Flask, jsonify, request
 
 import css_grabber
 
@@ -34,28 +34,23 @@ def index():
     return app.send_static_file("index.html")
 
 
-@app.post("/api/report")
+@app.route("/api/report", methods=["GET", "POST"])
 def generate_report():
     payload = request.get_json(silent=True) or {}
-    url = (payload.get("url") or request.form.get("url") or "").strip()
+    url = (payload.get("url") or request.form.get("url") or request.args.get("url") or "").strip()
 
     if not is_valid_target(url):
         return jsonify({"error": "Enter a valid http(s) URL."}), 400
 
-    slug = make_slug(url)
-
     try:
         with tempfile.TemporaryDirectory(prefix="css-grabber-") as td:
-            output = Path(td) / f"{slug}-report.html"
+            output = Path(td) / f"{make_slug(url)}-report.html"
             css_grabber.run(url, output)
-            return send_file(
-                output,
-                mimetype="text/html; charset=utf-8",
-                as_attachment=True,
-                download_name=f"{slug}-report.html",
-            )
+            return output.read_text(encoding="utf-8"), 200, {"Content-Type": "text/html; charset=utf-8"}
     except Exception as exc:
-        return jsonify({"error": f"Report generation failed: {exc}"}), 500
+        summary, hints = css_grabber.classify_fetch_error(exc)
+        html = css_grabber.render_error_report(url, summary, hints, str(exc))
+        return html, 502, {"Content-Type": "text/html; charset=utf-8"}
 
 
 if __name__ == "__main__":

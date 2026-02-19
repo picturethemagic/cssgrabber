@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CSS Grabber Report</title>
+  <meta name="robots" content="noindex,follow" />
+  <style>
+    :root {
+      --bg: #ffffff;
+      --ink: #17181b;
+      --muted: #6b6d73;
+      --line: #d8dadd;
+      --panel: #fafafb;
+      --brand: #0b63ce;
+      --soft-blue: #f4f8ff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+    }
+    .wrap { max-width: 1280px; margin: 0 auto; padding: 18px; }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .brand {
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      font-size: 22px;
+    }
+    a { color: var(--brand); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .frame-wrap {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: linear-gradient(180deg, #ffffff 0%, var(--soft-blue) 100%);
+      min-height: 80vh;
+      overflow: hidden;
+    }
+    .status {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 14px;
+      background: var(--panel);
+    }
+    iframe {
+      width: 100%;
+      height: calc(80vh - 46px);
+      border: 0;
+      background: #fff;
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <nav class="topbar" aria-label="Primary">
+      <div class="brand">CSS Grabber</div>
+      <a href="/">New Report</a>
+    </nav>
+
+    <section class="frame-wrap">
+      <div id="status" class="status">Loading report...</div>
+      <iframe id="report-frame" title="CSS Grabber Report"></iframe>
+    </section>
+  </main>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const target = (params.get("url") || "").trim();
+    const frame = document.getElementById("report-frame");
+    const status = document.getElementById("status");
+
+    if (!target) {
+      status.textContent = "Missing URL. Go back and submit a website.";
+    } else {
+      status.textContent = "Generating report for: " + target;
+      frame.src = "/api/report?url=" + encodeURIComponent(target);
+      frame.addEventListener("load", () => {
+        status.textContent = "Report ready for: " + target;
+      });
+    }
+  </script>
+</body>
+</html>
