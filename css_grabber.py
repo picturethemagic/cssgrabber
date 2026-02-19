@@ -63,6 +63,11 @@ class FontFaceEntry:
     display: str
 
 
+def is_ignored_font_family(name: str) -> bool:
+    n = (name or "").strip().lower()
+    return any(token in n for token in ("dashicons", "fontawesome", "material icons", "icon"))
+
+
 class SimpleHTMLIndex(HTMLParser):
     def __init__(self) -> None:
         super().__init__()
@@ -697,10 +702,20 @@ def extract_font_face_entries(css_text: str, base_url: str) -> List[FontFaceEntr
         src = decls.get("src")
         if not family or not src:
             continue
+        family_clean = family.strip().strip("\"'")
+        src_rewritten = rewrite_css_urls(src, base_url)
+        src_low = src_rewritten.lower()
+        if is_ignored_font_family(family_clean):
+            continue
+        # Drop malformed/tricky inline application font URIs that can break style parsing.
+        if "data:application/" in src_low:
+            continue
+        if src_rewritten.count("'") % 2 != 0 or src_rewritten.count('"') % 2 != 0:
+            continue
         entries.append(
             FontFaceEntry(
-                family=family.strip().strip("\"'"),
-                src=rewrite_css_urls(src, base_url),
+                family=family_clean,
+                src=src_rewritten,
                 style=clean_css_value(decls.get("font-style")) or "normal",
                 weight=clean_css_value(decls.get("font-weight")) or "400",
                 display=clean_css_value(decls.get("font-display")) or "swap",
@@ -730,6 +745,8 @@ def inline_used_font_faces(entries: List[FontFaceEntry], used_families: Set[str]
     blocks: List[str] = []
     for fam in used_families:
         fam_key = fam.lower().strip().strip("\"'")
+        if is_ignored_font_family(fam_key):
+            continue
         if fam_key not in by_family:
             continue
         count = 0
@@ -1471,10 +1488,8 @@ def run(url: str, output: Path) -> None:
     var_map = build_var_map(rules)
     styles = compute_styles(rules, parser.inline_styles, var_map, parser.first_element_attrs)
 
-    font_faces: List[str] = []
     font_entries: List[FontFaceEntry] = []
     for css, base in css_sources:
-        font_faces.extend(extract_font_faces(css, base))
         font_entries.extend(extract_font_face_entries(css, base))
 
     used_families: Set[str] = set()
@@ -1487,7 +1502,9 @@ def run(url: str, output: Path) -> None:
             used_families.add(first)
 
     inline_faces = inline_used_font_faces(font_entries, used_families)
-    font_face_css = "\n".join(filter(None, [inline_faces, "\n".join(dict.fromkeys(font_faces))]))
+    # Only include safely inlined faces. Raw third-party @font-face blocks can be malformed
+    # (especially data URI/format edge cases) and break the report's style tag.
+    font_face_css = inline_faces
 
     brand_roles = collect_brand_profile(rules, var_map, styles)
 
