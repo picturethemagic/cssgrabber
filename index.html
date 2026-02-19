@@ -476,7 +476,10 @@
 
     form.addEventListener("submit", async function (event) {
       event.preventDefault();
-      const value = input.value.trim();
+      let value = input.value.trim();
+      if (value && !/^https?:\/\//i.test(value)) {
+        value = "https://" + value;
+      }
       let parsed;
       try {
         parsed = new URL(value);
