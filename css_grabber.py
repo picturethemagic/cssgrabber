@@ -61,6 +61,7 @@ class FontFaceEntry:
     style: str
     weight: str
     display: str
+    unicode_range: str
 
 
 def is_ignored_font_family(name: str) -> bool:
@@ -72,6 +73,7 @@ class SimpleHTMLIndex(HTMLParser):
     def __init__(self) -> None:
         super().__init__()
         self.inline_styles: Dict[str, Dict[str, str]] = {}
+        self.inline_color_samples: List[Tuple[str, str, str, Dict[str, str]]] = []
         self.first_element_attrs: Dict[str, Dict[str, object]] = {}
         self.stylesheets: List[str] = []
         self.style_blocks: List[str] = []
@@ -88,13 +90,18 @@ class SimpleHTMLIndex(HTMLParser):
 
     def handle_starttag(self, tag: str, attrs: List[Tuple[str, Optional[str]]]) -> None:
         attr_map = {k.lower(): (v or "") for k, v in attrs}
+        classes = {c for c in attr_map.get("class", "").split() if c}
+        elem_id = attr_map.get("id", "")
 
         if tag in TARGET_ELEMENTS and "style" in attr_map and tag not in self.inline_styles:
             self.inline_styles[tag] = parse_declarations(attr_map["style"])
+        if "style" in attr_map:
+            decls = parse_declarations(attr_map["style"])
+            if any(k in decls for k in ("color", "background-color", "border-color", "fill", "stroke")):
+                self.inline_color_samples.append((tag, elem_id, " ".join(sorted(classes)), decls))
 
         if tag in TARGET_ELEMENTS and tag not in self.first_element_attrs:
-            classes = {c for c in attr_map.get("class", "").split() if c}
-            self.first_element_attrs[tag] = {"id": attr_map.get("id", ""), "classes": classes}
+            self.first_element_attrs[tag] = {"id": elem_id, "classes": classes}
 
         if tag == "link":
             rel = attr_map.get("rel", "").lower()
@@ -719,6 +726,7 @@ def extract_font_face_entries(css_text: str, base_url: str) -> List[FontFaceEntr
                 style=clean_css_value(decls.get("font-style")) or "normal",
                 weight=clean_css_value(decls.get("font-weight")) or "400",
                 display=clean_css_value(decls.get("font-display")) or "swap",
+                unicode_range=clean_css_value(decls.get("unicode-range")) or "",
             )
         )
     return entries
@@ -738,6 +746,23 @@ def first_font_url(src_value: str) -> Optional[str]:
 
 
 def inline_used_font_faces(entries: List[FontFaceEntry], used_families: Set[str]) -> str:
+    def font_entry_rank(entry: FontFaceEntry) -> Tuple[int, int]:
+        # Prefer Latin-capable subsets so sample text actually renders in the captured font.
+        u = (entry.unicode_range or "").lower()
+        score = 0
+        if not u:
+            score += 6
+        if "0000-00ff" in u or "0-00ff" in u or "0-5ff" in u:
+            score += 12
+        if "0100-024f" in u or "1e00-1eff" in u or "2000-206f" in u:
+            score += 4
+        if "0400" in u or "cyrillic" in u:
+            score -= 2
+        if "0370" in u or "greek" in u:
+            score -= 1
+        # Shorter range strings are usually the more general subset.
+        return (score, -len(u))
+
     by_family: Dict[str, List[FontFaceEntry]] = {}
     for e in entries:
         by_family.setdefault(e.family.lower(), []).append(e)
@@ -749,8 +774,22 @@ def inline_used_font_faces(entries: List[FontFaceEntry], used_families: Set[str]
             continue
         if fam_key not in by_family:
             continue
+        family_entries = by_family[fam_key]
+        by_variant: Dict[Tuple[str, str], List[FontFaceEntry]] = {}
+        for entry in family_entries:
+            by_variant.setdefault((entry.style, entry.weight), []).append(entry)
+
+        selected: List[FontFaceEntry] = []
+        for variant_entries in by_variant.values():
+            best = sorted(variant_entries, key=font_entry_rank, reverse=True)[0]
+            selected.append(best)
+
+        selected = sorted(selected, key=font_entry_rank, reverse=True)[:8]
+        if not selected:
+            selected = sorted(family_entries, key=font_entry_rank, reverse=True)[:8]
+
         count = 0
-        for entry in by_family[fam_key]:
+        for entry in selected:
             font_url = first_font_url(entry.src)
             if not font_url or font_url.startswith("data:"):
                 continue
@@ -761,6 +800,7 @@ def inline_used_font_faces(entries: List[FontFaceEntry], used_families: Set[str]
             fmt = "woff2" if ".woff2" in font_url else "woff"
             b64 = base64.b64encode(data).decode("ascii")
             data_url = f"data:font/{fmt};base64,{b64}"
+            unicode_rule = f"unicode-range: {entry.unicode_range}; " if entry.unicode_range else ""
             blocks.append(
                 "@font-face { "
                 f"font-family: '{entry.family}'; "
@@ -768,10 +808,23 @@ def inline_used_font_faces(entries: List[FontFaceEntry], used_families: Set[str]
                 f"font-style: {entry.style}; "
                 f"font-weight: {entry.weight}; "
                 f"font-display: {entry.display}; "
+                f"{unicode_rule}"
                 "}"
             )
+            alias = font_alias_name(entry.family)
+            if alias and alias.lower() != entry.family.lower():
+                blocks.append(
+                    "@font-face { "
+                    f"font-family: '{alias}'; "
+                    f"src: url('{data_url}') format('{fmt}'); "
+                    f"font-style: {entry.style}; "
+                    f"font-weight: {entry.weight}; "
+                    f"font-display: {entry.display}; "
+                    f"{unicode_rule}"
+                    "}"
+                )
             count += 1
-            if count >= 3:
+            if count >= 8:
                 break
     return "\\n".join(blocks)
 
@@ -855,6 +908,13 @@ def primary_font_name(font_family: Optional[str]) -> str:
     token = ff.split(",", 1)[0].strip().strip("\"'")
     if not token:
         return "not found"
+    alias = font_alias_name(token)
+    if alias:
+        return alias
+    return token
+
+
+def font_alias_name(token: str) -> Optional[str]:
     # Next.js font optimization often emits internal family names like
     # __Ubuntu_eefc74 or __DM_Sans_Fallback_abc123.
     m = re.match(r"^__([A-Za-z0-9_]+?)_[A-Fa-f0-9]+$", token)
@@ -862,7 +922,7 @@ def primary_font_name(font_family: Optional[str]) -> str:
         cleaned = m.group(1).replace("_Fallback", "").replace("_", " ").strip()
         if cleaned:
             return cleaned
-    return token
+    return None
 
 
 def extract_color_token(value: Optional[str]) -> Optional[str]:
@@ -960,6 +1020,28 @@ def is_noise_selector(selector: str) -> bool:
             "social-brand-colors",
             "social-show-brand",
             "shared-counts",
+            "__youtube_prefs",
+            "youtube_prefs",
+            "gdpr",
+            "cookie",
+            "consent",
+            "popup",
+            "pop-up",
+            "modal",
+            "dialog",
+            "overlay",
+            "lightbox",
+            "off-canvas",
+            "offcanvas",
+            "drawer",
+            "adthrive",
+            "wp-social-link",
+            "social-link-",
+            "formkit-spinner",
+            "formkit-alert",
+            "epyt-",
+            "ytp-",
+            "wprmp-",
         )
     )
 
@@ -969,23 +1051,68 @@ def selector_quality(selector: str) -> int:
     score = 0
     if any(token in s for token in ("site-header", "main-navigation", "primary-menu", "header-navigation", "site-main", "entry-content", "content-area", "site-footer")):
         score += 4
-    if any(token in s for token in ("button", ".btn", "formkit", "subscribe", "recipe-index", "cta")):
+    if any(token in s for token in ("button", ".btn", "subscribe", "recipe-index", "cta", "call-to-action", "wp-block-button", "read-more", "readmore")):
         score += 3
-    if any(token in s for token in ("widget-drawer", "mobile-navigation", "off-canvas", "sidebar")):
-        score -= 2
+    if any(token in s for token in ("widget-drawer", "mobile-navigation", "off-canvas", "sidebar", "dialog", "modal", "popup", "cookie", "consent", "gdpr", "overlay")):
+        score -= 4
     return score
+
+
+def is_neutral_color_token(color: str) -> bool:
+    c = (color or "").strip().lower()
+    if not c:
+        return True
+    if c in {"black", "white", "gray", "grey", "silver", "transparent"}:
+        return True
+    hx = color_to_hex(c)
+    if hx:
+        h = hx.lstrip("#")
+        if len(h) == 6:
+            r = int(h[0:2], 16)
+            g = int(h[2:4], 16)
+            b = int(h[4:6], 16)
+            return max(abs(r - g), abs(g - b), abs(r - b)) <= 14
+    m_rgb = re.match(r"rgba?\(([^)]+)\)", c)
+    if m_rgb:
+        parts = [p.strip() for p in m_rgb.group(1).split(",")]
+        if len(parts) >= 3:
+            try:
+                vals = [int(float(parts[i].rstrip("%"))) for i in range(3)]
+                return max(abs(vals[0] - vals[1]), abs(vals[1] - vals[2]), abs(vals[0] - vals[2])) <= 14
+            except Exception:
+                return False
+    m_hsl = re.match(r"hsla?\(([^)]+)\)", c)
+    if m_hsl:
+        parts = [p.strip() for p in m_hsl.group(1).split(",")]
+        if len(parts) >= 2:
+            sat = parts[1].rstrip("%").strip()
+            try:
+                return float(sat) <= 12.0
+            except Exception:
+                return False
+    return False
 
 
 def role_selector_bonus(role: str, selector: str) -> int:
     s = selector.strip().lower()
     if role == "link.default":
-        if any(token in s for token in ("nav", "menu", "header")) and "a" in s:
-            return 20
+        if "pagination" in s or "pager" in s:
+            return -8
+        if any(token in s for token in ("nav", "menu", "header", "sub-menu")) and "a" in s:
+            return -8
+        if any(token in s for token in ("entry-content", "article", "post-content", "site-main", "content")) and "a" in s:
+            return 12
         if s == "a":
             return 6
         if s.startswith("a:") and "hover" not in s:
             return 12
     if role == "link.hover":
+        if "pagination" in s or "pager" in s:
+            return -6
+        if any(token in s for token in ("nav", "menu", "header", "sub-menu")) and "a" in s:
+            return -6
+        if any(token in s for token in ("entry-content", "article", "post-content", "site-main", "content")) and "a" in s:
+            return 10
         if s in {"a:hover", "a:focus", "a:active", "a:focus-visible"}:
             return 20
         if s.startswith("a:"):
@@ -996,10 +1123,17 @@ def role_selector_bonus(role: str, selector: str) -> int:
         return 10
     if role.startswith("button.primary") and s in {"button", "input[type=submit]", "input[type=\"submit\"]"}:
         return 10
+    if role.startswith("button.primary") and s == ".wp-block-button__link":
+        return -8
     return 0
 
 
-def collect_brand_profile(rules: List[CSSRule], var_map: Dict[str, str], styles: Dict[str, Dict[str, str]]) -> List[BrandRoleResult]:
+def collect_brand_profile(
+    rules: List[CSSRule],
+    var_map: Dict[str, str],
+    styles: Dict[str, Dict[str, str]],
+    inline_samples: Optional[List[Tuple[str, str, str, Dict[str, str]]]] = None,
+) -> List[BrandRoleResult]:
     role_labels = {
         "text.body": "Text Body",
         "text.heading": "Text Heading",
@@ -1051,7 +1185,8 @@ def collect_brand_profile(rules: List[CSSRule], var_map: Dict[str, str], styles:
                 continue
 
             if prop == "color":
-                if "body" in sel_clean.lower() or sel_clean.lower() in {"html", "body", ":root", "*"}:
+                sel_norm = sel_clean.lower().strip()
+                if sel_norm in {"html", "body", ":root", "*"}:
                     add("text.body", color, sel, important, spec, rule.order, 3 + quality)
                 if is_heading:
                     add("text.heading", color, sel, important, spec, rule.order, 3 + quality)
@@ -1091,32 +1226,113 @@ def collect_brand_profile(rules: List[CSSRule], var_map: Dict[str, str], styles:
                 else:
                     add("icon.default", color, sel, important, spec, rule.order, 3 + quality)
 
+    for idx, sample in enumerate(inline_samples or []):
+        tag, elem_id, class_str, decls = sample
+        parts = [tag]
+        if elem_id:
+            parts.append(f"#{elem_id}")
+        if class_str:
+            parts.extend(f".{c}" for c in class_str.split() if c)
+        selector = "".join(parts)
+        if is_noise_selector(selector):
+            continue
+        spec = (1, 0, 0)
+        quality = selector_quality(selector) + 4
+        hover = has_hover_state(selector)
+        is_link = tag == "a" or is_link_selector(selector)
+        is_button = tag == "button" or is_button_selector(selector)
+        has_inline_button_shape = tag == "a" and any(k in decls for k in ("background-color", "border-color"))
+        if has_inline_button_shape:
+            is_button = True
+        is_icon = tag == "svg" or is_icon_selector(selector)
+        is_heading = tag in {"h1", "h2", "h3"} or is_heading_selector(selector)
+
+        for prop, raw in decls.items():
+            value = resolve_vars(raw, var_map)
+            color = extract_color_token(value)
+            if not color:
+                continue
+            if prop == "color":
+                if tag == "body" or selector.lower().strip() in {"html", "body", ":root"}:
+                    add("text.body", color, selector, True, spec, 10_000 + idx, 4 + quality)
+                if is_heading:
+                    add("text.heading", color, selector, True, spec, 10_000 + idx, 4 + quality)
+                if is_link and not hover:
+                    add("link.default", color, selector, True, spec, 10_000 + idx, 4 + quality)
+                if is_link and hover:
+                    add("link.hover", color, selector, True, spec, 10_000 + idx, 4 + quality)
+                if is_button and not hover:
+                    add("button.primary.text", color, selector, True, spec, 10_000 + idx, 4 + quality)
+                if is_icon and not hover:
+                    add("icon.default", color, selector, True, spec, 10_000 + idx, 3 + quality)
+                if is_icon and hover:
+                    add("icon.accent", color, selector, True, spec, 10_000 + idx, 3 + quality)
+            if prop == "background-color":
+                if is_button and not hover:
+                    add("button.primary.bg", color, selector, True, spec, 10_000 + idx, 5 + quality)
+                if is_button and hover:
+                    add("button.primary.hover.bg", color, selector, True, spec, 10_000 + idx, 5 + quality)
+                if is_page_surface_selector(selector):
+                    add("surface.page", color, selector, True, spec, 10_000 + idx, 4 + quality)
+                if is_section_surface_selector(selector):
+                    add("surface.section", color, selector, True, spec, 10_000 + idx, 3 + quality)
+                if is_card_surface_selector(selector):
+                    add("surface.card", color, selector, True, spec, 10_000 + idx, 3 + quality)
+            if prop == "border-color":
+                if is_button and not hover:
+                    add("button.primary.border", color, selector, True, spec, 10_000 + idx, 3 + quality)
+                add("border.default", color, selector, True, spec, 10_000 + idx, 2 + quality)
+            if prop in {"fill", "stroke"} and is_icon:
+                if hover:
+                    add("icon.accent", color, selector, True, spec, 10_000 + idx, 3 + quality)
+                else:
+                    add("icon.default", color, selector, True, spec, 10_000 + idx, 3 + quality)
+
     resolved: Dict[str, BrandRoleResult] = {}
 
     def pick(role: str) -> Optional[BrandRoleResult]:
         if not candidates[role]:
             return None
         if role == "link.default":
-            nav_context = [
-                c
-                for c in candidates[role]
-                if any(token in remove_pseudo(c[2]).lower() for token in ("nav", "menu", "header")) and "a" in remove_pseudo(c[2]).lower()
-            ]
-            if nav_context:
-                best = sorted(nav_context, key=lambda item: item[0], reverse=True)[0]
-                return BrandRoleResult(role, role_labels[role], best[1], best[2], "found")
-            exact = [c for c in candidates[role] if remove_pseudo(c[2]).strip().lower() == "a"]
-            if exact:
-                best = sorted(exact, key=lambda item: item[0], reverse=True)[0]
-                return BrandRoleResult(role, role_labels[role], best[1], best[2], "found")
+            def s_clean(c: Tuple[Tuple[int, Tuple[int, int, int], int, int], str, str]) -> str:
+                return remove_pseudo(c[2]).strip().lower()
+
+            nav_tokens = ("nav", "menu", "header", "sub-menu")
+            content_tokens = ("entry-content", "article", "post-content", "site-main", "content")
+            pool = [c for c in candidates[role] if "a" in s_clean(c)]
+            content = [c for c in pool if any(tok in s_clean(c) for tok in content_tokens)]
+            non_nav = [c for c in pool if not any(tok in s_clean(c) for tok in nav_tokens)]
+            exact = [c for c in pool if s_clean(c) == "a"]
+
+            for group in (content, non_nav, exact):
+                if group:
+                    best = sorted(group, key=lambda item: item[0], reverse=True)[0]
+                    return BrandRoleResult(role, role_labels[role], best[1], best[2], "found")
         if role == "link.hover":
-            exact = [
-                c
-                for c in candidates[role]
-                if remove_pseudo(c[2]).strip().lower() in {"a:hover", "a:focus", "a:active", "a:focus-visible"}
-            ]
-            if exact:
-                best = sorted(exact, key=lambda item: item[0], reverse=True)[0]
+            def s_clean(c: Tuple[Tuple[int, Tuple[int, int, int], int, int], str, str]) -> str:
+                return remove_pseudo(c[2]).strip().lower()
+
+            nav_tokens = ("nav", "menu", "header", "sub-menu")
+            content_tokens = ("entry-content", "article", "post-content", "site-main", "content")
+            pool = [c for c in candidates[role] if "a" in s_clean(c)]
+            content = [c for c in pool if any(tok in s_clean(c) for tok in content_tokens)]
+            non_nav = [c for c in pool if not any(tok in s_clean(c) for tok in nav_tokens)]
+            exact = [c for c in pool if s_clean(c) in {"a:hover", "a:focus", "a:active", "a:focus-visible"}]
+
+            for group in (content, non_nav, exact):
+                if group:
+                    best = sorted(group, key=lambda item: item[0], reverse=True)[0]
+                    return BrandRoleResult(role, role_labels[role], best[1], best[2], "found")
+
+        if role in {"link.default", "link.hover"}:
+            vivid = [c for c in candidates[role] if not is_neutral_color_token(c[1])]
+            if vivid:
+                best = sorted(vivid, key=lambda item: item[0], reverse=True)[0]
+                return BrandRoleResult(role, role_labels[role], best[1], best[2], "found")
+        if role in {"button.primary.bg", "icon.accent", "surface.section", "surface.card"}:
+            vivid = [c for c in candidates[role] if not is_neutral_color_token(c[1])]
+            if vivid:
+                best = sorted(vivid, key=lambda item: item[0], reverse=True)[0]
                 return BrandRoleResult(role, role_labels[role], best[1], best[2], "found")
         best = sorted(candidates[role], key=lambda item: item[0], reverse=True)[0]
         return BrandRoleResult(role, role_labels[role], best[1], best[2], "found")
@@ -1168,6 +1384,10 @@ def render_font_row(label: str, styles: Dict[str, str]) -> str:
     line_height = clean_css_value(styles.get("line-height")) or "1.4"
     name = primary_font_name(family)
     preview_family = family or "-apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif"
+    first_token = (family or "").split(",", 1)[0].strip().strip("\"'")
+    alias = font_alias_name(first_token) if first_token else None
+    if alias and family:
+        preview_family = f"'{alias}', {family}, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif"
     return (
         '<div class="type-row">'
         f'<div class="type-name">{esc(label)} = {esc(name)}</div>'
@@ -1212,7 +1432,11 @@ def render_report(
     role_map = {role.key: role.value for role in brand_roles}
     body_hex = color_to_hex(role_map.get("text.body")) or "#000000"
     title_hex = color_to_hex(role_map.get("text.heading")) or body_hex
-    link_hex = color_to_hex(role_map.get("link.default")) or body_hex
+    link_default_raw = role_map.get("link.default") or ""
+    link_hover_raw = role_map.get("link.hover") or ""
+    link_hex = color_to_hex(link_default_raw) or body_hex
+    if is_neutral_color_token(link_default_raw) and not is_neutral_color_token(link_hover_raw):
+        link_hex = color_to_hex(link_hover_raw) or link_hex
     typography_rows = [
         render_font_row("H1", styles.get("h1", {})),
         render_font_row("H2", styles.get("h2", {})),
@@ -1506,7 +1730,7 @@ def run(url: str, output: Path) -> None:
     # (especially data URI/format edge cases) and break the report's style tag.
     font_face_css = inline_faces
 
-    brand_roles = collect_brand_profile(rules, var_map, styles)
+    brand_roles = collect_brand_profile(rules, var_map, styles, parser.inline_color_samples)
 
     report = render_report(url, site_root_url, site_title, logo_url, logo_embed_src, styles, font_face_css, brand_roles)
     output.write_text(report, encoding="utf-8")
