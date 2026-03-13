@@ -1,0 +1,44 @@
+name: "Site request: analyze this URL"
+description: "Request extraction testing/improvements for a specific site."
+title: "[Site Request]: "
+labels:
+  - site-request
+  - extraction
+body:
+  - type: input
+    id: target_url
+    attributes:
+      label: Target URL
+      description: Public URL to test.
+      placeholder: "https://example.com"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: focus
+    attributes:
+      label: What should we prioritize?
+      options:
+        - label: Logo detection
+        - label: Typography extraction
+        - label: Color palette extraction
+        - label: Brand role mapping (buttons/surfaces/borders/icons)
+        - label: Bot-block/error behavior
+
+  - type: textarea
+    id: expected_brand_tokens
+    attributes:
+      label: Known expected tokens (optional)
+      description: Share any known font names, color hexes, or logo URL.
+      placeholder: "Body font: Poppins, Link color: #255563, Logo: https://..."
+    validations:
+      required: false
+
+  - type: textarea
+    id: success_criteria
+    attributes:
+      label: Success criteria
+      description: How should we know this request is complete?
+      placeholder: "Report should show the primary logo and correct body/link colors."
+    validations:
+      required: true

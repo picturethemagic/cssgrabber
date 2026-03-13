@@ -1,0 +1,63 @@
+name: "Bug report: extraction mismatch"
+description: "Report incorrect logo/font/color extraction for a site."
+title: "[Bug]: "
+labels:
+  - bug
+  - extraction
+body:
+  - type: input
+    id: target_url
+    attributes:
+      label: Target URL
+      description: Public page URL that was analyzed.
+      placeholder: "https://example.com"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Extraction area
+      options:
+        - logo-detection
+        - font-detection
+        - color-detection
+        - output-rendering
+        - bot-blocked
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result
+      description: What should have been extracted?
+      placeholder: "Expected body font to be Poppins and link color #255563."
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual result
+      description: What did CSS Grabber return instead?
+      placeholder: "Returned body font as not found and link color #242424."
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence (optional)
+      description: Add CSS snippet, inspector output, or screenshot URLs.
+      placeholder: "Paste CSS selectors/properties or links to screenshots."
+    validations:
+      required: false
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional notes (optional)
+      placeholder: "Any context that may help reproduce."
+    validations:
+      required: false
