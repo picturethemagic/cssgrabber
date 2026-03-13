@@ -16,10 +16,8 @@ Live app: [cssgrabber.com](https://cssgrabber.com)
 - Marketing/brand teams: competitor style reconnaissance
 
 ## How it works
-1. Submit a public URL.
-2. CSS Grabber fetches HTML/CSS/assets server-side.
-3. Engine parses selectors, declarations, inline styles, and metadata.
-4. Report renders as clean HTML ready to review, print, or save as PDF.
+Submit a public URL and CSS Grabber returns a one-page HTML brand report with logo, typography, and color tokens.
+The hosted service processes requests server-side and is designed for public, non-login pages.
 
 ## Project structure
 - `css_grabber.py` - extraction engine and report renderer
@@ -28,6 +26,11 @@ Live app: [cssgrabber.com](https://cssgrabber.com)
 - `output.html` - hosted report viewer
 - `terms.html` - terms and privacy page
 - `Procfile` - Gunicorn startup for hosting platforms
+
+## Public repo scope
+This repository is public for product transparency, onboarding, and issue tracking.
+Operational hardening details, anti-abuse controls, and production tuning are intentionally limited in public documentation.
+Please do not use this project to bypass third-party access controls or bot protections.
 
 ## Local development
 
@@ -77,10 +80,10 @@ Please include:
 - What was expected vs what was extracted
 - Screenshot when possible
 
-## Roadmap themes
-- Extraction quality benchmarking and regression fixtures
-- Better anti-bot classification and recovery messaging
-- Optional API mode and batch processing
+## Security and responsible use
+- Use only on sites you are authorized to analyze.
+- Do not attempt to bypass third-party protections.
+- If you find a security issue, report privately rather than posting exploit details in a public issue.
 
 ## License
 No license file has been added yet. If you plan open contribution, add a license (MIT is common).
