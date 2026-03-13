@@ -8,7 +8,6 @@ CSS Grabber is a free web tool and Python engine that analyzes a public URL and 
 - Core and role-based brand colors in hex
 
 Live app: [cssgrabber.com](https://cssgrabber.com)  
-Web app endpoint: [cssgrabber.onrender.com](https://cssgrabber.onrender.com)
 
 ## Why teams use CSS Grabber
 - UI designers: fast visual teardown without digging through DevTools
